@@ -26,14 +26,28 @@ if (-not $env:WEB_EXT_API_KEY -or -not $env:WEB_EXT_API_SECRET) {
 }
 
 Write-Host 'Firma in corso su addons.mozilla.org...'
-npx --yes web-ext sign --channel=unlisted --source-dir . `
-  --ignore-files 'build/**' 'test/**' 'tools/**' 'web-ext-artifacts/**'
+New-Item -ItemType Directory -Force -Path 'web-ext-artifacts' | Out-Null
+$log = Join-Path 'web-ext-artifacts' 'sign.log'
+$errLog = Join-Path 'web-ext-artifacts' 'sign.err.log'
 
-if ($LASTEXITCODE -ne 0) {
-  Write-Host 'Firma non riuscita. Controlla le credenziali API e la connessione.'
-  exit $LASTEXITCODE
+# Start-Process evita che PowerShell interpreti i messaggi di npm su stderr
+# come errori che interrompono lo script.
+$proc = Start-Process -FilePath 'npx.cmd' -NoNewWindow -Wait -PassThru `
+  -RedirectStandardOutput $log -RedirectStandardError $errLog `
+  -ArgumentList @(
+    '--yes', 'web-ext', 'sign', '--channel=unlisted', '--source-dir', '.',
+    '--ignore-files', 'build/**', 'test/**', 'tools/**', 'web-ext-artifacts/**'
+  )
+
+if ($proc.ExitCode -ne 0) {
+  Write-Host ''
+  Write-Host ('Firma non riuscita (codice ' + $proc.ExitCode + '). Ultime righe:')
+  Get-Content $log -Tail 20 -ErrorAction SilentlyContinue
+  Get-Content $errLog -Tail 20 -ErrorAction SilentlyContinue
+  exit $proc.ExitCode
 }
 
 Write-Host ''
-Write-Host 'Fatto: il file .xpi firmato è in web-ext-artifacts/.'
+Write-Host 'Fatto: il file .xpi firmato è in web-ext-artifacts/:'
+Get-ChildItem 'web-ext-artifacts\*.xpi' | Select-Object -ExpandProperty Name
 Write-Host 'Installalo da about:addons -> ingranaggio -> "Installa componente da file...".'
