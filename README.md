@@ -38,12 +38,28 @@ L'installazione temporanea sparisce quando chiudi Firefox: ideale per provare, n
 npx web-ext run --source-dir .
 ```
 
-### Installazione permanente
+### Installazione permanente (firma «non in elenco», consigliata)
 
-Firefox normale installa solo estensioni firmate. Per uso personale puoi:
+Firefox normale installa solo estensioni firmate. Con un account AMO gratuito puoi firmarla in modalità **«non in elenco»**: si installa in modo permanente nel Firefox di tutti i giorni e non compare nel negozio.
 
-1. Creare il pacchetto: `npx web-ext build --overwrite-dest --ignore-files "build/**" "test/**" "tools/**"` (zip in `web-ext-artifacts/`).
-2. Oppure usare Firefox Developer Edition / Nightly con `xpinstall.signatures.required = false` in `about:config` e caricare il file `.zip` da `about:addons` → ingranaggio → «Installa componente da file…».
+1. Crea un account su [addons.mozilla.org](https://addons.mozilla.org) e attiva la verifica in due passaggi (Serve per le credenziali API).
+2. Genera chiave e segreto su [addons.mozilla.org/developers/addon/api/key/](https://addons.mozilla.org/developers/addon/api/key/).
+3. Dalla cartella del progetto esegui:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File tools/sign-unlisted.ps1
+   ```
+
+   e incolla chiave e segreto quando richiesto (l'input del segreto è nascosto).
+4. Installa il file `.xpi` firmato (in `web-ext-artifacts/`) da `about:addons` → ingranaggio → «Installa componente da file…».
+
+Per ogni nuova versione: alza `version` in `manifest.json`, rifai la firma e reinstalla il nuovo `.xpi`.
+
+### Altre modalità
+
+- **Solo prova** (senza installazione): `npx web-ext run --source-dir .`, come descritto sopra.
+- **Firefox Developer Edition / Nightly**: con `xpinstall.signatures.required = false` in `about:config` puoi installare il pacchetto non firmato da `about:addons` → ingranaggio → «Installa componente da file…». Nel Firefox normale questa opzione non ha effetto.
+- **Zip non firmato** (per ispezione o firma manuale): `npx web-ext build --overwrite-dest --ignore-files "build/**" "test/**" "tools/**"` (lo trovi in `web-ext-artifacts/`).
 
 ## Configurazione
 
@@ -175,6 +191,7 @@ tools/
   dev-build.mjs          Costruisce build/dev/ con la pagina finta
   e2e-test.ps1           Test end-to-end headless (build → server → Firefox → risultato)
   test-core.mjs          Test unitari/integrazione (node --test)
+  sign-unlisted.ps1      Firma «non in elenco» su AMO (installazione permanente)
   make-icons.ps1         Generatore icone
 ```
 
