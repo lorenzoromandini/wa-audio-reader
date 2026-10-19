@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Audio → Testo — Impostazioni</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <img class="hero-logo" src="../../icons/icon-96.png" alt="" width="56" height="56" />
+        <div>
+          <h1>Audio → Testo</h1>
+          <p class="hero-sub">
+            Trascrive i messaggi vocali di WhatsApp Web: leggi il testo senza ascoltare l'audio.
+          </p>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>1. Servizio di trascrizione</h2>
+        <p class="lead">
+          L'audio viene inviato solo al servizio che scegli tu, solo quando premi «Trascrivi»
+          (o automaticamente, se attivi l'opzione più sotto).
+        </p>
+
+        <div class="providers" id="providers" role="radiogroup" aria-label="Servizio di trascrizione"></div>
+
+        <div class="field" id="field-key">
+          <label for="apiKey">Chiave API</label>
+          <div class="input-row">
+            <input type="password" id="apiKey" autocomplete="off" spellcheck="false" placeholder="Incolla qui la chiave" />
+            <button type="button" class="btn ghost small" id="toggle-key">Mostra</button>
+          </div>
+          <p class="hint" id="key-hint"></p>
+        </div>
+
+        <div class="field" id="field-endpoint" hidden>
+          <label for="endpoint">URL del server</label>
+          <input type="url" id="endpoint" spellcheck="false" placeholder="http://localhost:8080/v1/audio/transcriptions" />
+          <p class="hint">
+            Va bene sia l'endpoint completo sia la sola base (es. <code>http://localhost:8080/v1</code>):
+            il percorso <code>/audio/transcriptions</code> viene aggiunto in automatico.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="model">Modello</label>
+          <input type="text" id="model" spellcheck="false" list="model-list" />
+          <datalist id="model-list"></datalist>
+          <p class="hint">
+            Lascia vuoto per usare il predefinito: <span id="default-model"></span>.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="language">Lingua parlata</label>
+          <select id="language"></select>
+          <p class="hint">
+            Indicare la lingua migliora la precisione. «Rileva automaticamente» va bene per audio con
+            lingue miste.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="prompt">Contesto per il modello <span class="opt">(facoltativo)</span></label>
+          <textarea id="prompt" rows="3" maxlength="800" placeholder="Es: nomi propri, sigle aziendali, termini tecnici ricorrenti…"></textarea>
+          <p class="hint">Aiuta il modello a scrivere correttamente nomi e parole che ricorrono spesso.</p>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn primary" id="save">Salva impostazioni</button>
+          <button type="button" class="btn" id="test">Verifica connessione</button>
+        </div>
+        <p class="feedback" id="feedback" hidden></p>
+      </section>
+
+      <section class="card">
+        <h2>2. Trascrizione automatica</h2>
+        <label class="switch-row" for="auto">
+          <span class="switch"><input type="checkbox" id="auto" /><span class="knob"></span></span>
+          <span>Trascrivi da solo i vocali ricevuti che compaiono nella schermata</span>
+        </label>
+        <p class="hint">
+          Comodo ma consuma credito API senza che tu clicchi nulla. Ogni audio viene trascritto una
+          sola volta: poi resta in cache.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>3. Trascrizioni salvate</h2>
+        <p class="info" id="cache-info">…</p>
+        <div class="actions">
+          <button type="button" class="btn danger" id="clear-cache">Cancella tutte le trascrizioni</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Note utili</h2>
+        <ul class="bullets">
+          <li>
+            Per trascrivere, WhatsApp deve scaricare il vocale: l'estensione preme il suo pulsante di
+            riproduzione ma blocca l'audio prima che parta. Il messaggio può comunque risultare
+            «riprodotto» per il mittente.
+          </li>
+          <li>La chiave API è salvata in <code>storage.local</code>, dentro il profilo Firefox.</li>
+          <li>
+            Il pulsante «Trascrivi» compare sotto i vocali su
+            <a href="https://web.whatsapp.com" target="_blank" rel="noopener">web.whatsapp.com</a>.
+            Dopo il salvataggio non serve ricaricare WhatsApp.
+          </li>
+          <li>Le trascrizioni restano nel browser finché non le cancelli da qui.</li>
+        </ul>
+      </section>
+
+      <footer class="foot">
+        <span id="version"></span>
+        <span class="sep">·</span>
+        <a href="https://web.whatsapp.com" target="_blank" rel="noopener">Apri WhatsApp Web</a>
+      </footer>
+    </main>
+
+    <script src="../shared/core.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

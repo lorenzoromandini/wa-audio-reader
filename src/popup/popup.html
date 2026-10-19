@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Audio → Testo</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body class="popup">
+    <header class="p-head">
+      <img src="../../icons/icon-48.png" alt="" width="30" height="30" />
+      <div class="p-head-text">
+        <strong>Audio → Testo</strong>
+        <span class="pill" id="status">…</span>
+      </div>
+    </header>
+
+    <div class="p-body">
+      <p class="p-line" id="provider-line">…</p>
+
+      <label class="switch-row" for="auto">
+        <span class="switch"><input type="checkbox" id="auto" /><span class="knob"></span></span>
+        <span>Trascrizione automatica</span>
+      </label>
+      <p class="p-hint">I vocali ricevuti che compaiono nella schermata vengono trascritti da soli.</p>
+
+      <div class="p-actions">
+        <button type="button" class="btn primary" id="open-options">Impostazioni</button>
+        <button type="button" class="btn" id="clear-cache">Svuota cache</button>
+      </div>
+
+      <p class="p-note" id="cache-note">…</p>
+    </div>
+
+    <footer class="p-foot">
+      Funziona su <a href="https://web.whatsapp.com" target="_blank" rel="noopener">web.whatsapp.com</a>
+    </footer>
+
+    <script src="../shared/core.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

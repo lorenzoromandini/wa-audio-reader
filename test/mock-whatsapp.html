@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Finta WhatsApp Web — test estensione</title>
+    <style>
+      :root {
+        --panel: #ffffff;
+        --bg: #f0f2f5;
+        --bubble-in: #ffffff;
+        --bubble-out: #d9fdd3;
+        --fg: #111b21;
+        --muted: #667781;
+        --line: rgba(11, 20, 26, 0.1);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 30%;
+        min-width: 240px;
+        background: var(--panel);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+      .chat-item {
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.04);
+        font-weight: 600;
+      }
+      .chat-item small { display: block; font-weight: 400; color: var(--muted); }
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--panel);
+        min-width: 0;
+      }
+      .chat-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+        font-weight: 600;
+      }
+      .messages {
+        flex: 1;
+        padding: 20px 24px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow: auto;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .row.out { flex-direction: row-reverse; }
+      .avatar {
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #b8d8c9;
+        color: #04503f;
+        font-weight: 700;
+        font-size: 14px;
+        display: grid;
+        place-items: center;
+      }
+      .col { display: flex; flex-direction: column; max-width: 62%; }
+      .row.out .col { align-items: flex-end; }
+      .bubble {
+        position: relative;
+        background: var(--bubble-in);
+        border-radius: 12px;
+        padding: 10px 12px 8px;
+        box-shadow: 0 1px 1px rgba(11, 20, 26, 0.12);
+      }
+      .row.out .bubble { background: var(--bubble-out); }
+      .voice {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 330px;
+        max-width: 100%;
+      }
+      .transport {
+        flex: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 0;
+        background: rgba(0, 128, 105, 0.12);
+        color: transparent;
+        font-size: 0;
+        cursor: pointer;
+      }
+      .row.playing .transport {
+        background: rgba(0, 128, 105, 0.3);
+      }
+      .wave {
+        flex: 1;
+        height: 26px;
+        border-radius: 6px;
+        background-image: repeating-linear-gradient(
+          90deg,
+          rgba(102, 119, 129, 0.45) 0 2px,
+          transparent 2px 5px
+        );
+      }
+      .dur { flex: none; font-size: 13px; color: var(--muted); }
+      .speed {
+        flex: none;
+        border: 0;
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .meta {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 4px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .ptt { display: none; }
+      .text-body { padding: 2px 4px; font-size: 14.5px; }
+      .harness,
+      .result {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+      }
+      .harness { bottom: 74px; background: #fff3cd; color: #6b5200; }
+      .result { bottom: 12px; background: #04503f; color: #eafff6; }
+      .result.fail { background: #7f1d1d; color: #ffe4e6; }
+      .result.ok { background: #04503f; }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="chat-item">Mario Rossi <small>Vocale · 0:07</small></div>
+    </aside>
+
+    <main id="main">
+      <div class="chat-header">Mario Rossi</div>
+      <div class="messages">
+        <!-- Vocale già pronto: il play fa partire l'audio (che l'estensione blocca) -->
+        <div class="row in" role="row" data-id="false_393401234567@c.us_3EB0AAAA1">
+          <div class="avatar">MR</div>
+          <div class="col">
+            <div class="bubble">
+              <div class="voice">
+                <button class="transport" data-role="transport" aria-label="Riproduci messaggio vocale">play</button>
+                <div class="wave" role="slider" aria-label="Posizione del messaggio vocale"></div>
+                <span class="dur">0:07</span>
+                <button class="speed" aria-label="Cambia velocità di riproduzione">1x</button>
+              </div>
+              <span class="ptt" data-icon="ptt-status"></span>
+              <div class="meta"><span>10:24</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vocale non ancora scaricato: mostra "download" e poi diventa play -->
+        <div class="row in" role="row" data-id="false_393401234567@c.us_3EB0AAAA2">
+          <div class="avatar">MR</div>
+          <div class="col">
+            <div class="bubble">
+              <div class="voice">
+                <button
+                  class="transport"
+                  data-role="transport"
+                  data-needs-download="1"
+                  aria-label="Scarica messaggio vocale"
+                >
+                  download
+                </button>
+                <div class="wave" role="slider" aria-label="Posizione del messaggio vocale"></div>
+                <span class="dur">0:12</span>
+              </div>
+              <span class="ptt" data-icon="ptt-status"></span>
+              <div class="meta"><span>10:26</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vocale in uscita: anche qui deve comparire il pulsante -->
+        <div class="row out" role="row" data-id="true_393401234567@c.us_3EB0AAAA3">
+          <div class="col">
+            <div class="bubble">
+              <div class="voice">
+                <button class="transport" data-role="transport" aria-label="Riproduci messaggio vocale">play</button>
+                <div class="wave" role="slider" aria-label="Posizione del messaggio vocale"></div>
+                <span class="dur">0:05</span>
+                <button class="speed" aria-label="Cambia velocità di riproduzione">1,5x</button>
+              </div>
+              <span class="ptt" data-icon="ptt-status"></span>
+              <div class="meta"><span>10:31</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messaggio di testo: qui NON deve comparire nessun pulsante -->
+        <div class="row in" role="row" data-id="false_393401234567@c.us_3EB0AAAA4">
+          <div class="avatar">MR</div>
+          <div class="col">
+            <div class="bubble">
+              <div class="text-body">Ok, ci sentiamo più tardi 👍</div>
+              <div class="meta"><span>10:33</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controllo velocità: non deve essere scambiato per il play -->
+      </div>
+    </main>
+
+    <div class="harness" id="harness">Test in corso: attendo il pulsante «Trascrivi» dell'estensione…</div>
+    <div class="result" id="result">…</div>
+
+    <script>
+      // --- Finto WhatsApp: decrittazione + play tramite new Audio() staccato ---
+      const SAMPLE_RATE = 16000;
+
+      function silentWavBlob(seconds) {
+        const samples = Math.round(SAMPLE_RATE * seconds);
+        const dataSize = samples * 2;
+        const buffer = new ArrayBuffer(44 + dataSize);
+        const view = new DataView(buffer);
+        const ascii = (offset, text) => {
+          for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i));
+        };
+        ascii(0, "RIFF");
+        view.setUint32(4, 36 + dataSize, true);
+        ascii(8, "WAVE");
+        ascii(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, SAMPLE_RATE, true);
+        view.setUint32(28, SAMPLE_RATE * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        ascii(36, "data");
+        view.setUint32(40, dataSize, true);
+        return new Blob([buffer], { type: "audio/wav" });
+      }
+
+      document.querySelectorAll(".row").forEach((row) => {
+        const button = row.querySelector('[data-role="transport"]');
+        if (!button) return; // messaggi di testo: niente controlli di riproduzione
+
+        const state = {
+          playing: false,
+          downloaded: !row.querySelector('[data-needs-download="1"]')
+        };
+
+        button.addEventListener("click", () => {
+          if (!state.downloaded) {
+            button.textContent = "download…";
+            setTimeout(() => {
+              state.downloaded = true;
+              button.textContent = "play";
+              button.removeAttribute("data-needs-download");
+              button.setAttribute("aria-label", "Riproduci messaggio vocale");
+            }, 700);
+            return;
+          }
+
+          if (state.playing) {
+            state.playing = false;
+            row.classList.remove("playing");
+            button.setAttribute("aria-label", "Riproduci messaggio vocale");
+            return;
+          }
+
+          state.playing = true;
+          row.classList.add("playing");
+          button.setAttribute("aria-label", "Metti in pausa il messaggio vocale");
+
+          const url = URL.createObjectURL(silentWavBlob(0.6));
+          const audio = new Audio(url);
+          audio.play().catch(() => {});
+          setTimeout(() => URL.revokeObjectURL(url), 20000);
+        });
+      });
+
+      // --- Harness del test end-to-end ---
+      const harness = document.getElementById("harness");
+      const result = document.getElementById("result");
+
+      function waitFor(fn, timeout, step) {
+        return new Promise((resolve) => {
+          const started = Date.now();
+          const tick = () => {
+            let value = null;
+            try {
+              value = fn();
+            } catch (_) {}
+            if (value) return resolve(value);
+            if (Date.now() - started > timeout) return resolve(null);
+            setTimeout(tick, step || 150);
+          };
+          tick();
+        });
+      }
+
+      function report(message) {
+        result.textContent = message;
+        result.className = "result " + (message.indexOf("RIUSCITO") === 0 ? "ok" : "fail");
+        document.title = message.slice(0, 90);
+        fetch("/result", { method: "POST", body: message }).catch(() => {});
+      }
+
+      /** Avanzamento intermedio: aiuta a capire dove si blocca il test. */
+      function progress(label) {
+        harness.textContent = label;
+        fetch("/result", { method: "POST", body: "STEP: " + label }).catch(() => {});
+      }
+
+      (async () => {
+        const started = Date.now();
+        const notes = [];
+
+        const wrappers = await waitFor(
+          () => (document.querySelectorAll(".wa-tt").length === 3 ? document.querySelectorAll(".wa-tt") : null),
+          25000
+        );
+        if (!wrappers) {
+          report(
+            "FAIL: trovati " + document.querySelectorAll(".wa-tt").length + " pulsanti invece di 3 " +
+              "(content script non attivo?)"
+          );
+          return;
+        }
+
+        const textRowHasButton = !!document.querySelector(
+          '.row[data-id$="3EB0AAAA4"] .wa-tt'
+        );
+        if (textRowHasButton) {
+          report("FAIL: pulsante aggiunto anche a un messaggio di testo");
+          return;
+        }
+        notes.push("3 vocali rilevati, 0 falsi positivi");
+
+        async function transcribe(index, label) {
+          const wrap = document.querySelectorAll(".wa-tt")[index];
+          const button = wrap.querySelector(".wa-tt-btn");
+          const redo = wrap.querySelector(".wa-tt-redo");
+          const isBusy = () => !!wrap.querySelector(".wa-tt-status.wa-tt-busy");
+          const readText = () => {
+            const node = wrap.querySelector(".wa-tt-text");
+            return node && node.textContent.trim();
+          };
+
+          // "started" scatta quando parte la lavorazione (pulsante di nuovo
+          // visibile o stato "occupato"). All'inizio è già vero se il pulsante
+          // "Trascrivi" è a schermo; dopo una rigenerazione parte da false,
+          // così non si legge il testo vecchio prima che riparta il lavoro.
+          let started = !button.hidden;
+          if (started) button.click();
+          else redo.click();
+
+          const began = await waitFor(() => {
+            if (!button.hidden || isBusy()) started = true;
+            return started;
+          }, 10000, 100);
+          if (!began) throw new Error(label + ": la trascrizione non e partita");
+
+          const text = await waitFor(() => {
+            if (wrap.querySelector(".wa-tt-status.wa-tt-error")) return null;
+            const value = readText();
+            return !isBusy() && button.hidden && value ? value : null;
+          }, 40000);
+
+          if (!text) {
+            const error = wrap.querySelector(".wa-tt-status.wa-tt-error");
+            throw new Error(label + ": " + (error ? error.textContent : "nessun testo"));
+          }
+          return text;
+        }
+
+        let transcript;
+        try {
+          progress("trascrivo il primo vocale");
+          transcript = await transcribe(0, "primo vocale");
+          notes.push("primo vocale ok");
+
+          progress("trascrivo il vocale da scaricare");
+          await transcribe(1, "vocale da scaricare");
+          notes.push("download automatico ok");
+
+          progress("rigenero la prima trascrizione");
+          await transcribe(0, "rigenerazione");
+          notes.push("rigenerazione ok");
+        } catch (err) {
+          report(
+            "FAIL dopo " + Math.round((Date.now() - started) / 1000) + "s: " +
+              String((err && err.message) || err)
+          );
+          return;
+        }
+
+        report("TEST RIUSCITO: " + transcript + " [" + notes.join(", ") + "]");
+      })();
+    </script>
+  </body>
+</html>

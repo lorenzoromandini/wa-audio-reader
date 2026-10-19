@@ -1,0 +1,7 @@
+# cartelle generate
+build/
+web-ext-artifacts/
+node_modules/
+
+# file temporanei
+*.log

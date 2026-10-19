@@ -1,0 +1,185 @@
+/* UI dell'estensione dentro WhatsApp Web.
+   Stili espliciti per non farsi contaminare dal CSS di WhatsApp. */
+
+.wa-tt {
+  --wa-tt-fg: #111b21;
+  --wa-tt-muted: #667781;
+  --wa-tt-accent: #008069;
+  --wa-tt-accent-soft: rgba(0, 128, 105, 0.1);
+  --wa-tt-panel: #ffffff;
+  --wa-tt-border: rgba(11, 20, 26, 0.12);
+  --wa-tt-shadow: 0 1px 2px rgba(11, 20, 26, 0.1);
+  --wa-tt-error: #b3261e;
+
+  display: block;
+  width: 100%;
+  flex-basis: 100%;
+  clear: both;
+  margin: 0 0 10px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--wa-tt-fg);
+}
+
+.wa-tt.wa-tt-dark {
+  --wa-tt-fg: #e9edef;
+  --wa-tt-muted: #8696a0;
+  --wa-tt-accent: #25d366;
+  --wa-tt-accent-soft: rgba(37, 211, 102, 0.14);
+  --wa-tt-panel: #111b21;
+  --wa-tt-border: rgba(233, 237, 239, 0.16);
+  --wa-tt-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --wa-tt-error: #f2867e;
+}
+
+.wa-tt *,
+.wa-tt *::before,
+.wa-tt *::after {
+  box-sizing: border-box;
+}
+
+.wa-tt-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wa-tt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 5px 13px;
+  border: 1px solid var(--wa-tt-border);
+  border-radius: 999px;
+  background: var(--wa-tt-accent-soft);
+  color: var(--wa-tt-accent);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.wa-tt-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--wa-tt-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--wa-tt-accent) 45%, transparent);
+}
+
+.wa-tt-btn:focus-visible {
+  outline: 2px solid var(--wa-tt-accent);
+  outline-offset: 2px;
+}
+
+.wa-tt-btn:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.wa-tt-btn svg {
+  display: block;
+  flex: none;
+}
+
+.wa-tt-status {
+  font-size: 12.5px;
+  color: var(--wa-tt-muted);
+  white-space: normal;
+}
+
+.wa-tt-status.wa-tt-error {
+  color: var(--wa-tt-error);
+  font-weight: 500;
+}
+
+.wa-tt-status.wa-tt-busy::after {
+  content: "";
+  animation: wa-tt-dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes wa-tt-dots {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
+}
+
+.wa-tt-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--wa-tt-muted);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.wa-tt-link:hover {
+  color: var(--wa-tt-accent);
+  text-decoration: underline;
+}
+
+.wa-tt-link:focus-visible {
+  outline: 2px solid var(--wa-tt-accent);
+  outline-offset: 2px;
+}
+
+.wa-tt-panel {
+  display: inline-block;
+  max-width: min(68ch, 100%);
+  margin-top: 7px;
+  padding: 11px 14px;
+  border: 1px solid var(--wa-tt-border);
+  border-left: 3px solid var(--wa-tt-accent);
+  border-radius: 10px;
+  background: var(--wa-tt-panel);
+  box-shadow: var(--wa-tt-shadow);
+  text-align: left;
+}
+
+.wa-tt-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--wa-tt-fg);
+}
+
+.wa-tt-text:empty::before {
+  content: "Nessun parlato riconosciuto.";
+  color: var(--wa-tt-muted);
+}
+
+.wa-tt-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 9px;
+}
+
+.wa-tt-meta {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--wa-tt-muted);
+  white-space: nowrap;
+}
+
+.wa-tt-panel[hidden],
+.wa-tt-toggle[hidden],
+.wa-tt-settings[hidden],
+.wa-tt-btn[hidden] {
+  display: none !important;
+}
