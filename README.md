@@ -1,12 +1,13 @@
 # Audio → Testo per WhatsApp Web
 
 [![Firefox 142+](https://img.shields.io/badge/Firefox-142%2B-FF7139?logo=firefoxbrowser&logoColor=white)](https://www.mozilla.org/firefox/)
+[![Licenza: MIT](https://img.shields.io/badge/licenza-MIT-25D366)](LICENSE)
 
 Estensione Firefox che **trascrive i messaggi vocali di WhatsApp Web**: sotto ogni vocale compare un pulsante «Trascrivi» e il testo appare direttamente nella chat, **senza mai riprodurre l'audio**.
 
 Perfetta quando non puoi (o non vuoi) ascoltare: ufficio, riunioni, ambiente rumoroso.
 
-![Estensione: pulsante sotto i vocali, testo nella chat](icons/icon-128.png)
+![Firefox con l'estensione in azione sulla pagina di prova: un vocale trascritto e i pulsanti «Trascrivi» sugli altri](images/screenshot.png)
 
 ## Perché è nata
 
@@ -174,6 +175,9 @@ npx web-ext lint --ignore-files "build/**" "test/**"
 
 # Rigenera le icone
 powershell -ExecutionPolicy Bypass -File tools/make-icons.ps1
+
+# Rigenera lo screenshot del README (apre Firefox per pochi secondi)
+powershell -ExecutionPolicy Bypass -File tools/make-screenshot.ps1
 ```
 
 ### Struttura
@@ -189,6 +193,7 @@ src/
   options/               Pagina impostazioni
   popup/                 Popup della barra degli strumenti
 icons/                   Icone generate
+images/                  Screenshot usato nel README
 test/
   mock-whatsapp.html     Pagina finta di WhatsApp per i test (4 chat: 3 vocali + 1 testo)
   mock-server.mjs        Finto servizio OpenAI-compatibile + server della pagina + esito test
@@ -199,6 +204,7 @@ tools/
   test-core.mjs          Test unitari/integrazione (node --test)
   sign-unlisted.ps1      Firma «non in elenco» su AMO (installazione permanente)
   make-icons.ps1         Generatore icone
+  make-screenshot.ps1    Rigenera images/screenshot.png (demo in Firefox)
 ```
 
 ## Stato
@@ -210,3 +216,7 @@ tools/
 - Firma AMO «non in elenco» e installazione permanente in Firefox ✔
 
 Verificato con Firefox 158 su WhatsApp Web (ottobre 2026).
+
+## Licenza
+
+Distribuita con licenza [MIT](LICENSE): puoi usarla, modificarla e ridistribuirla liberamente, mantenendo l'avviso di copyright.

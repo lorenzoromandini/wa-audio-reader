@@ -28,7 +28,10 @@ export function startMockServer(port = 8787) {
   const server = createServer(async (req, res) => {
     const url = new URL(req.url || "/", "http://localhost:" + port);
 
-    if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/test/mock-whatsapp.html")) {
+    if (
+      req.method === "GET" &&
+      (url.pathname === "/" || url.pathname === "/test/mock-whatsapp.html" || url.pathname === "/demo")
+    ) {
       try {
         const html = await readFile(join(root, "test", "mock-whatsapp.html"), "utf8");
         return send(res, 200, html, "text/html; charset=utf-8");

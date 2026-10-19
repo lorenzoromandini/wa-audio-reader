@@ -339,6 +339,13 @@
       }
 
       (async () => {
+        const screenshotMode =
+          new URLSearchParams(location.search).has("screenshot") || location.pathname === "/demo";
+        if (screenshotMode) {
+          harness.style.display = "none";
+          result.style.display = "none";
+          document.title = "WhatsApp";
+        }
         const started = Date.now();
         const notes = [];
 
@@ -398,6 +405,16 @@
             throw new Error(label + ": " + (error ? error.textContent : "nessun testo"));
           }
           return text;
+        }
+
+        // Modalità screenshot: trascrive solo il primo vocale, così nella foto
+        // si vedono sia il testo sia i pulsanti «Trascrivi» degli altri.
+        if (screenshotMode) {
+          try {
+            await transcribe(0, "screenshot");
+          } catch (_) {}
+          fetch("/result", { method: "POST", body: "SCREENSHOT PRONTO" }).catch(() => {});
+          return;
         }
 
         let transcript;
