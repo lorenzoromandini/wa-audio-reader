@@ -55,9 +55,12 @@ async function refresh() {
 
 autoEl.addEventListener("change", async () => {
   settings = Core.sanitizeSettings(Object.assign({}, settings, { auto: autoEl.checked }));
-  await browser.storage.local.set({ [Core.SETTINGS_KEY]: settings });
-  setPill(autoEl.checked ? "Automatico attivo" : "Pronto", autoEl.checked ? "ok" : "ok");
-  setTimeout(refresh, 900);
+  try {
+    await browser.storage.local.set({ [Core.SETTINGS_KEY]: settings });
+  } catch (_) {}
+  // refresh() ricalcola anche lo stato (configurazione e permessi), che non
+  // dipende dall'interruttore appena mosso.
+  await refresh();
 });
 
 openOptions.addEventListener("click", () => {

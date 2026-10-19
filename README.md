@@ -13,6 +13,7 @@ Perfetta quando non puoi (o non vuoi) ascoltare: ufficio, riunioni, ambiente rum
 - Mostra la trascrizione nella bolla, con **Copia**, **Rigenera** (nuova trascrizione) e «Nascondi/Mostra testo».
 - Le trascrizioni sono **salvate in locale** e riusate: ogni vocale viene trascritto una sola volta.
 - **Trascrizione automatica** (opzionale, spenta di default): i vocali ricevuti che compaiono sullo schermo vengono trascritti da soli.
+- **Scorciatoia da tastiera** **Alt+Maiusc+T**: trascrive al volo l'ultimo vocale della chat (anche in uscita).
 - Funziona con **Groq** (consigliato, piano gratuito), **OpenAI** o un **server locale OpenAI-compatibile** (l'audio non lascia il PC).
 
 ## Requisiti
@@ -179,8 +180,9 @@ tools/
 
 ## Stato
 
-- Test unitari: 10/10 ✔
+- Test unitari: 11/11 ✔
 - `web-ext lint` (escludendo `test/` e `build/`): 0 errori, 0 avvisi ✔
 - Test end-to-end (headless): 3 vocali rilevati, 0 falsi positivi, download automatico e rigenerazione ✔ (eseguito due volte, stabile)
+- Prova manuale su WhatsApp Web reale: trascrizione dei vocali e scorciatoia Alt+Maiusc+T ✔ (versione 1.1.0)
 
-Verificato con Firefox 158 su WhatsApp Web (luglio 2026).
+Verificato con Firefox 158 su WhatsApp Web (ottobre 2026).

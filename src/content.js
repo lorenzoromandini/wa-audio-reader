@@ -40,6 +40,7 @@
   let hookCheckedAt = 0;
   let requestSeq = 0;
   let fallbackKeySeq = 0;
+  let uiSeq = 0;
   let autoPumping = false;
   let autoQueue = [];
   let captureChain = Promise.resolve();
@@ -444,6 +445,7 @@
     btn.append(icon("transcript"), label);
 
     const status = el("span", STATUS_IDLE);
+    status.setAttribute("role", "status");
 
     const toggle = el("button", "wa-tt-link wa-tt-toggle", "Nascondi");
     toggle.type = "button";
@@ -457,6 +459,12 @@
 
     const panel = el("div", "wa-tt-panel");
     panel.hidden = true;
+    panel.id = "wa-tt-panel-" + ++uiSeq;
+    panel.setAttribute("role", "region");
+    panel.setAttribute("aria-label", "Trascrizione dell'audio");
+    panel.setAttribute("aria-live", "polite");
+    toggle.setAttribute("aria-controls", panel.id);
+    toggle.setAttribute("aria-expanded", "false");
     const text = el("p", "wa-tt-text");
     text.dir = "auto";
     const actions = el("div", "wa-tt-actions");
@@ -498,6 +506,7 @@
     toggle.addEventListener("click", () => {
       panel.hidden = !panel.hidden;
       toggle.textContent = panel.hidden ? "Mostra testo" : "Nascondi";
+      toggle.setAttribute("aria-expanded", String(!panel.hidden));
     });
     copy.addEventListener("click", async () => {
       const ok = await copyText(text.textContent || "");
@@ -565,6 +574,7 @@
 
     ui.toggle.hidden = false;
     ui.toggle.textContent = "Nascondi";
+    ui.toggle.setAttribute("aria-expanded", "true");
     ui.panel.hidden = false;
   }
 
@@ -668,6 +678,51 @@
     } finally {
       autoPumping = false;
     }
+  }
+
+  // ------------------------------------------------------- comandi da tastiera
+
+  /** L'ultimo vocale della chat: l'ultimo in ordine di DOM, se trascrivibile. */
+  function latestVoiceUi() {
+    const scope = document.querySelector("#main") || document.body;
+    if (!scope) return null;
+    scan();
+    const rows = findRows(scope);
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const row = rows[i];
+      const ui = uiByRow.get(row);
+      if (ui && ui.wrap.isConnected && ui.state !== "busy") return ui;
+    }
+    return null;
+  }
+
+  function handleCommand(command) {
+    if (command !== "transcribe-latest") return;
+    if (!contextAlive()) {
+      shutdown();
+      return;
+    }
+    const ui = latestVoiceUi();
+    if (!ui) return;
+    try {
+      ui.wrap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    } catch (_) {}
+    if (ui.state === "done") {
+      ui.panel.hidden = false;
+      ui.toggle.textContent = "Nascondi";
+      ui.toggle.setAttribute("aria-expanded", "true");
+      return;
+    }
+    run(ui.row, ui, {});
+  }
+
+  function watchCommands() {
+    try {
+      browser.runtime.onMessage.addListener((msg) => {
+        if (!msg || msg.type !== "wa-tt/command") return;
+        handleCommand(msg.command);
+      });
+    } catch (_) {}
   }
 
   // ------------------------------------------------------- scansione e vita
@@ -919,6 +974,7 @@
     await loadSettings();
     if (stopped) return;
     watchSettings();
+    watchCommands();
     setupObservers();
     scan();
   })();

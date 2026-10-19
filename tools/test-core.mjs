@@ -92,6 +92,23 @@ test("base64 fa andata e ritorno senza perdere byte", () => {
   assert.deepEqual(Array.from(back), Array.from(original));
 });
 
+test("buildTranscribeForm omette la lingua automatica e usa il modello predefinito", () => {
+  const { form, model } = Core.buildTranscribeForm(
+    { provider: "groq", apiKey: "gsk_x", language: "auto", prompt: "Nomi: Anna, ACME" },
+    new Uint8Array([1, 2, 3]),
+    "audio/ogg; codecs=opus"
+  );
+  assert.equal(model, "whisper-large-v3-turbo");
+  assert.equal(form.get("model"), "whisper-large-v3-turbo");
+  assert.equal(form.get("language"), null);
+  assert.equal(form.get("prompt"), "Nomi: Anna, ACME");
+  assert.equal(form.get("response_format"), "json");
+  const file = form.get("file");
+  assert.equal(file.name, "vocale.ogg");
+  assert.equal(file.type, "audio/ogg; codecs=opus");
+  assert.equal(file.size, 3);
+});
+
 test("richiesta end-to-end verso il server finto", async (t) => {
   const { server, port } = await startMockServer(0);
   t.after(() => server.close());

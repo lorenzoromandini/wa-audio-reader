@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Audio → Testo per WhatsApp Web",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Trascrive i messaggi vocali di WhatsApp Web: leggi il testo dell'audio senza riprodurlo.",
   "browser_specific_settings": {
     "gecko": {
@@ -40,6 +40,12 @@
       "all_frames": false
     }
   ],
+  "commands": {
+    "transcribe-latest": {
+      "suggested_key": { "default": "Alt+Shift+T" },
+      "description": "Trascrivi l'ultimo vocale della chat"
+    }
+  },
   "action": {
     "default_title": "Audio → Testo",
     "default_popup": "src/popup/popup.html",

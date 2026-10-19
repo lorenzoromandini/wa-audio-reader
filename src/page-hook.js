@@ -22,13 +22,13 @@
   if (window.__WA_TT_HOOK__) return;
   window.__WA_TT_HOOK__ = true;
 
-  const VERSION = 1;
+  const VERSION = 2;
   const MAX_BYTES = 25 * 1024 * 1024;
-  const MAX_RETAINED = 40;
   const MAX_SEEN = 30;
+  /** Dopo la cattura il blocco resta per una breve coda: WhatsApp a volte
+      chiama play() un istante dopo aver assegnato .src. */
+  const DISARM_TAIL_MS = 1500;
 
-  /** Blob audio visti passare (per un secondo tentativo a freddo). */
-  const retained = new Map();
   /** Elementi media già usati, così possiamo zittirli tutti. */
   const seen = new Set();
 
@@ -106,8 +106,6 @@
       const blob = await res.blob();
       if (!blob || !blob.size) return reply(id, { ok: false, error: "audio vuoto" });
       if (blob.size > MAX_BYTES) return reply(id, { ok: false, error: "too-large" });
-      retained.set(url, blob);
-      while (retained.size > MAX_RETAINED) retained.delete(retained.keys().next().value);
       const base64 = await blobToBase64(blob);
       if (!base64) return reply(id, { ok: false, error: "conversione audio fallita" });
       reply(id, { ok: true, base64, type: blob.type || "audio/ogg", size: blob.size });
@@ -120,25 +118,13 @@
 
   try {
     const origCreate = URL.createObjectURL.bind(URL);
-    const origRevoke = URL.revokeObjectURL.bind(URL);
 
     URL.createObjectURL = function (obj) {
       const url = origCreate(obj);
       try {
-        if (obj instanceof Blob && !(obj instanceof File) && looksLikeAudio(obj)) {
-          retained.set(url, obj);
-          while (retained.size > MAX_RETAINED) retained.delete(retained.keys().next().value);
-          grab(url);
-        }
+        if (obj instanceof Blob && !(obj instanceof File) && looksLikeAudio(obj)) grab(url);
       } catch (_) {}
       return url;
-    };
-
-    URL.revokeObjectURL = function (url) {
-      try {
-        retained.delete(url);
-      } catch (_) {}
-      return origRevoke(url);
     };
   } catch (_) {}
 
@@ -244,21 +230,10 @@
       if (action === "disarm") {
         if (capture && capture.timer) clearTimeout(capture.timer);
         capture = null;
-        suppressUntil = 0;
+        // Non azzera il blocco: una piccola coda protegge dal play() tardivo
+        // che WhatsApp può chiamare subito dopo la cattura.
+        suppressUntil = Math.max(suppressUntil, Date.now() + DISARM_TAIL_MS);
         reply(id, { ok: true, stopped: silenceAll() });
-        return;
-      }
-
-      if (action === "reopen") {
-        const url = String(ev.data.url || "");
-        const blob = retained.get(url);
-        if (!blob) {
-          reply(id, { ok: false, error: "not-retained" });
-          return;
-        }
-        blobToBase64(blob)
-          .then((base64) => reply(id, { ok: true, base64, type: blob.type || "audio/ogg", size: blob.size }))
-          .catch((err) => reply(id, { ok: false, error: String((err && err.message) || err) }));
         return;
       }
 
@@ -267,8 +242,7 @@
           ok: true,
           version: VERSION,
           suppressing: suppressing(),
-          armed: !!capture && !capture.done,
-          retained: retained.size
+          armed: !!capture && !capture.done
         });
         return;
       }

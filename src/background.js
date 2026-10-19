@@ -167,3 +167,19 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
   return undefined;
 });
+
+// Scorciatoie da tastiera: inoltra il comando alla scheda attiva, dove il
+// content script sceglie l'ultimo vocale della chat.
+if (browser.commands && browser.commands.onCommand) {
+  browser.commands.onCommand.addListener(async (command) => {
+    if (command !== "transcribe-latest") return;
+    try {
+      const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs && tabs[0];
+      if (!tab || tab.id == null) return;
+      await browser.tabs.sendMessage(tab.id, { type: "wa-tt/command", command });
+    } catch (_) {
+      // La scheda attiva non è WhatsApp Web o il content script non è attivo.
+    }
+  });
+}
