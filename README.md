@@ -1,10 +1,16 @@
 # Audio → Testo per WhatsApp Web
 
+[![Firefox 142+](https://img.shields.io/badge/Firefox-142%2B-FF7139?logo=firefoxbrowser&logoColor=white)](https://www.mozilla.org/firefox/)
+
 Estensione Firefox che **trascrive i messaggi vocali di WhatsApp Web**: sotto ogni vocale compare un pulsante «Trascrivi» e il testo appare direttamente nella chat, **senza mai riprodurre l'audio**.
 
 Perfetta quando non puoi (o non vuoi) ascoltare: ufficio, riunioni, ambiente rumoroso.
 
 ![Estensione: pulsante sotto i vocali, testo nella chat](icons/icon-128.png)
+
+## Perché è nata
+
+Firefox non aveva un'estensione per trascrivere i vocali di WhatsApp Web: su altri browser sì, su Firefox no. Questo progetto nasce per colmare quel vuoto, con un'attenzione particolare alla privacy: l'audio viene inviato solo al servizio scelto dall'utente (o resta sul computer con un server locale) e non viene mai riprodotto.
 
 ## Cosa fa
 
@@ -201,5 +207,6 @@ tools/
 - `web-ext lint` (escludendo `test/` e `build/`): 0 errori, 0 avvisi ✔
 - Test end-to-end (headless): 3 vocali rilevati, 0 falsi positivi, download automatico e rigenerazione ✔ (eseguito due volte, stabile)
 - Prova manuale su WhatsApp Web reale: trascrizione dei vocali e scorciatoia Alt+Maiusc+T ✔ (versione 1.1.0)
+- Firma AMO «non in elenco» e installazione permanente in Firefox ✔
 
 Verificato con Firefox 158 su WhatsApp Web (ottobre 2026).
